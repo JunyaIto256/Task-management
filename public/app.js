@@ -99,8 +99,9 @@ document.querySelectorAll('.nav-btn').forEach(btn => {
   btn.addEventListener('click', () => {
     const view = btn.dataset.view;
     document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-    document.querySelectorAll('.view').forEach(v => { v.classList.remove('active'); });
+    document.querySelectorAll('.view').forEach(v => { v.classList.remove('active'); v.classList.add('hidden'); });
     btn.classList.add('active');
+    $(`view-${view}`).classList.remove('hidden');
     $(`view-${view}`).classList.add('active');
     currentView = view;
     if (view === 'tasks') loadTasks();
