@@ -26,7 +26,9 @@ async function api(method, path, body) {
   if (body) opts.body = JSON.stringify(body);
   const res = await fetch('/api' + path, opts);
   if (res.status === 401) { logout(); throw new Error('認証が必要です'); }
-  return res.json();
+  const text = await res.text();
+  if (!text) return null;
+  try { return JSON.parse(text); } catch { return null; }
 }
 
 function showApp(user) {
@@ -485,6 +487,7 @@ function initSocket() {
   socket = io({ auth: { token: getToken() } });
 
   socket.on('message', msg => {
+    if (!msg || !msg.id) return;
     const exists = chatMessages.find(m => m.id === msg.id);
     if (!exists) {
       chatMessages.push(msg);
@@ -504,9 +507,8 @@ function initSocket() {
   });
 
   socket.on('bulk-read', ({ userId, username }) => {
-    // 全メッセージの既読情報を更新
     chatMessages.forEach(msg => {
-      if (!msg.readers) msg.readers = [];
+      if (!msg || !msg.readers) { if (msg) msg.readers = []; else return; }
       if (!msg.readers.includes(username)) {
         msg.readers.push(username);
         msg.read_count = msg.readers.length;

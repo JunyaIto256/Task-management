@@ -82,7 +82,10 @@ function auth(req, res, next) {
   const token = req.headers.authorization?.split(' ')[1];
   if (!token) return res.status(401).json({ error: '認証が必要です' });
   try {
-    req.user = jwt.verify(token, JWT_SECRET);
+    const decoded = jwt.verify(token, JWT_SECRET);
+    const user = db.prepare('SELECT id, username FROM users WHERE id = ?').get(decoded.id);
+    if (!user) return res.status(401).json({ error: 'セッションが無効です。再登録してください。' });
+    req.user = decoded;
     next();
   } catch {
     res.status(401).json({ error: 'トークンが無効です' });
@@ -238,6 +241,7 @@ app.post('/api/messages', auth, (req, res) => {
     'INSERT INTO messages (user_id, content, task_id) VALUES (?, ?, ?)'
   ).run(req.user.id, content.trim(), taskId || null);
   const msg = getMsgWithMeta(result.lastInsertRowid);
+  if (!msg) return res.status(500).json({ error: 'メッセージの送信に失敗しました' });
   io.emit('message', msg);
   res.json(msg);
 });
