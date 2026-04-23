@@ -300,4 +300,4 @@ cron.schedule('* * * * *', () => {
   });
 });
 
-httpServer.listen(PORT, () => console.log(`サーバー起動中: http://localhost:${PORT}`));
+httpServer.listen(PORT, '0.0.0.0', () => console.log(`サーバー起動中: http://0.0.0.0:${PORT}`));
