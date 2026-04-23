@@ -8,21 +8,63 @@
 </head>
 <body>
 
-<div id="app">
-  <!-- ヘッダー -->
+<!-- ログイン/登録オーバーレイ -->
+<div id="auth-overlay">
+  <div id="auth-box">
+    <h1>タスク管理</h1>
+    <div id="auth-tabs">
+      <button class="auth-tab active" data-tab="login">ログイン</button>
+      <button class="auth-tab" data-tab="register">新規登録</button>
+    </div>
+    <div id="auth-error" class="auth-error hidden"></div>
+
+    <form id="login-form">
+      <div class="form-group">
+        <label>ユーザー名</label>
+        <input type="text" id="login-username" required autocomplete="username">
+      </div>
+      <div class="form-group">
+        <label>パスワード</label>
+        <input type="password" id="login-password" required autocomplete="current-password">
+      </div>
+      <button type="submit" class="btn-primary" style="width:100%">ログイン</button>
+    </form>
+
+    <form id="register-form" class="hidden">
+      <div class="form-group">
+        <label>ユーザー名</label>
+        <input type="text" id="reg-username" required autocomplete="username">
+      </div>
+      <div class="form-group">
+        <label>パスワード（6文字以上）</label>
+        <input type="password" id="reg-password" required autocomplete="new-password">
+      </div>
+      <button type="submit" class="btn-primary" style="width:100%">登録</button>
+    </form>
+  </div>
+</div>
+
+<!-- メインアプリ -->
+<div id="app" class="hidden">
   <header>
     <h1>タスク管理</h1>
-    <div id="notification-area">
-      <label>通知時刻: <input type="time" id="notify-time" value="08:00"></label>
-      <button id="subscribe-btn">通知を有効化</button>
+    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+      <span id="current-user" style="font-size:.85rem;color:#64748b;"></span>
+      <div id="notification-area">
+        <label>通知時刻: <input type="time" id="notify-time" value="08:00"></label>
+        <button id="subscribe-btn">通知を有効化</button>
+      </div>
+      <button id="logout-btn" class="btn-secondary" style="font-size:.82rem;padding:5px 10px;">ログアウト</button>
     </div>
   </header>
 
-  <!-- ナビゲーション -->
   <nav>
     <button class="nav-btn active" data-view="calendar">カレンダー</button>
     <button class="nav-btn" data-view="tasks">タスク一覧</button>
     <button class="nav-btn" data-view="progress">進捗</button>
+    <button class="nav-btn" data-view="chat">
+      チャット<span id="chat-badge" class="chat-badge hidden">0</span>
+    </button>
   </nav>
 
   <!-- カレンダービュー -->
@@ -67,6 +109,15 @@
     <h2>進捗サマリー</h2>
     <div id="progress-overall"></div>
     <div id="progress-charts"></div>
+  </section>
+
+  <!-- チャットビュー -->
+  <section id="view-chat" class="view hidden">
+    <div id="chat-messages"></div>
+    <div id="chat-input-area">
+      <textarea id="chat-input" placeholder="メッセージを入力… (Enter送信 / Shift+Enterで改行)" rows="1"></textarea>
+      <button id="chat-send" class="btn-primary">送信</button>
+    </div>
   </section>
 </div>
 
@@ -126,6 +177,12 @@
   </div>
 </div>
 
+<!-- 既読者ポップオーバー -->
+<div id="readers-popup" class="hidden">
+  <div id="readers-list"></div>
+</div>
+
+<script src="/socket.io/socket.io.js"></script>
 <script src="app.js"></script>
 </body>
 </html>
